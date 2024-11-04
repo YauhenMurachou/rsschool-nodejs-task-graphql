@@ -9,30 +9,23 @@ import {
 } from 'graphql';
 import { Context } from '../types/context.js';
 import { UUIDType } from '../types/uuid.js';
-import { User } from '@prisma/client';
-import { UserType } from './type.js';
+import {
+  BasicArgs,
+  ChangeUser,
+  CreateUser,
+  SubscribeUnsubscribe,
+  UserType,
+} from './type.js';
 
-type ChangeUser = {
-  id: string;
-  dto: Omit<User, 'id'>;
-};
-
-type CreateUser = {
-  dto: Omit<User, 'id'>;
-};
-
-type DeleteUser = {
-  id: string;
-};
-
-type Args = {
-  userId: string;
-  authorId: string;
+const UuidInput = { type: new GraphQLNonNull(UUIDType) };
+const subscribeArgs = {
+  userId: UuidInput,
+  authorId: UuidInput,
 };
 
 const subscribedToResolver = async (
   _source: unknown,
-  { userId, authorId }: Args,
+  { userId, authorId }: SubscribeUnsubscribe,
   { prisma }: Context,
 ) => {
   await prisma.user.update({
@@ -90,7 +83,7 @@ async function changeUserResolver(
 
 async function deleteUserResolver(
   _source: unknown,
-  { id }: DeleteUser,
+  { id }: BasicArgs,
   { prisma }: Context,
 ) {
   const user = await prisma.user.delete({
@@ -103,7 +96,7 @@ async function deleteUserResolver(
 
 async function unsubscribeFromResolver(
   _source: unknown,
-  { userId, authorId }: Args,
+  { userId, authorId }: SubscribeUnsubscribe,
   { prisma }: Context,
 ) {
   const subscription = await prisma.subscribersOnAuthors.delete({
@@ -126,35 +119,29 @@ const createUser: GraphQLFieldConfig<void, Context, CreateUser> = {
 const changeUser: GraphQLFieldConfig<void, Context, ChangeUser> = {
   type: UserType as GraphQLObjectType,
   args: {
-    id: { type: new GraphQLNonNull(UUIDType) },
+    id: UuidInput,
     dto: { type: new GraphQLNonNull(ChangeUserInput) },
   },
   resolve: changeUserResolver,
 };
 
-const deleteUser: GraphQLFieldConfig<void, Context, DeleteUser> = {
-  type: new GraphQLNonNull(UUIDType),
+const deleteUser: GraphQLFieldConfig<void, Context, BasicArgs> = {
+  type: UuidInput.type,
   args: {
-    id: { type: new GraphQLNonNull(UUIDType) },
+    id: UuidInput,
   },
   resolve: deleteUserResolver,
 };
 
-const subscribeTo: GraphQLFieldConfig<void, Context, Args> = {
+const subscribeTo: GraphQLFieldConfig<void, Context, SubscribeUnsubscribe> = {
   type: GraphQLBoolean,
-  args: {
-    userId: { type: new GraphQLNonNull(UUIDType) },
-    authorId: { type: new GraphQLNonNull(UUIDType) },
-  },
+  args: subscribeArgs,
   resolve: subscribedToResolver,
 };
 
-const unsubscribeFrom: GraphQLFieldConfig<void, Context, Args> = {
+const unsubscribeFrom: GraphQLFieldConfig<void, Context, SubscribeUnsubscribe> = {
   type: UUIDType,
-  args: {
-    userId: { type: new GraphQLNonNull(UUIDType) },
-    authorId: { type: new GraphQLNonNull(UUIDType) },
-  },
+  args: subscribeArgs,
   resolve: unsubscribeFromResolver,
 };
 

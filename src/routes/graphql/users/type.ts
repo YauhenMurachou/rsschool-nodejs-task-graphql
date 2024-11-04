@@ -5,11 +5,25 @@ import { ProfileType } from '../profiles/type.js';
 import { User } from '@prisma/client';
 import { Context } from '../types/context.js';
 
-type Args = {
+export type BasicArgs = {
   id: string;
 };
 
-async function postsResolver({ id }: Args, _source: unknown, { prisma }: Context) {
+export type ChangeUser = {
+  id: string;
+  dto: Omit<User, 'id'>;
+};
+
+export type CreateUser = {
+  dto: Omit<User, 'id'>;
+};
+
+export type SubscribeUnsubscribe = {
+  userId: string;
+  authorId: string;
+};
+
+async function postsResolver({ id }: BasicArgs, _source: unknown, { prisma }: Context) {
   return await prisma.post.findMany({
     where: {
       authorId: id,
@@ -17,7 +31,7 @@ async function postsResolver({ id }: Args, _source: unknown, { prisma }: Context
   });
 }
 
-async function profileResolver({ id }: Args, _source: unknown, { prisma }: Context) {
+async function profileResolver({ id }: BasicArgs, _source: unknown, { prisma }: Context) {
   return await prisma.profile.findUnique({
     where: {
       userId: id,
@@ -26,7 +40,7 @@ async function profileResolver({ id }: Args, _source: unknown, { prisma }: Conte
 }
 
 async function subscribedToUserResolver(
-  { id }: Args,
+  { id }: BasicArgs,
   _source: unknown,
   { prisma }: Context,
 ) {
@@ -42,7 +56,7 @@ async function subscribedToUserResolver(
 }
 
 async function userSubscribedToResolver(
-  { id }: Args,
+  { id }: BasicArgs,
   _source: unknown,
   { prisma }: Context,
 ) {

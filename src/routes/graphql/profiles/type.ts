@@ -34,3 +34,16 @@ export const ProfileType = new GraphQLObjectType<Profile, Context>({
   name: 'Profile',
   fields: () => profileFields,
 });
+
+export type BasicArgs = {
+  id: string;
+};
+
+export type ChangeProfile = {
+  id: string;
+  dto: Omit<Profile, 'id' | 'userId'>;
+};
+
+export type CreateProfile = {
+  dto: Omit<Profile, 'id'>;
+};

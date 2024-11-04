@@ -1,4 +1,3 @@
-import { Post } from '@prisma/client';
 import {
   GraphQLFieldConfig,
   GraphQLInputObjectType,
@@ -6,28 +5,17 @@ import {
   GraphQLString,
 } from 'graphql';
 import { Context } from '../types/context.js';
-import { Post as PostType } from './type.js';
+import { CreatePost, Post as PostType, BasicArgs, UpdatePost } from './type.js';
 import { UUIDType } from '../types/uuid.js';
 
-type CreatePost = {
-  dto: Omit<Post, 'id'>;
-};
-
-type RemovePost = {
-  id: string;
-};
-
-type UpdatePost = {
-  id: string;
-  dto: Omit<Post, 'id'>;
-};
+const UuidInput = { type: new GraphQLNonNull(UUIDType) };
 
 const CreatePostInput = new GraphQLInputObjectType({
   name: 'CreatePostInput',
   fields: () => ({
     title: { type: new GraphQLNonNull(GraphQLString) },
     content: { type: new GraphQLNonNull(GraphQLString) },
-    authorId: { type: new GraphQLNonNull(UUIDType) },
+    authorId: UuidInput,
   }),
 });
 
@@ -61,10 +49,10 @@ async function changePostResolver(
 
 async function deletePostResolver(
   _source: unknown,
-  { id }: RemovePost,
+  { id }: BasicArgs,
   { prisma }: Context,
 ) {
-  const post = await prisma.post.delete({ where: { id: id } });
+  const post = await prisma.post.delete({ where: { id } });
   return post.id;
 }
 
@@ -77,15 +65,15 @@ const createPost: GraphQLFieldConfig<void, Context, CreatePost> = {
 const changePost: GraphQLFieldConfig<void, Context, UpdatePost> = {
   type: PostType,
   args: {
-    id: { type: new GraphQLNonNull(UUIDType) },
+    id: UuidInput,
     dto: { type: new GraphQLNonNull(ChangePostInput) },
   },
   resolve: changePostResolver,
 };
 
-const deletePost: GraphQLFieldConfig<void, Context, RemovePost> = {
+const deletePost: GraphQLFieldConfig<void, Context, BasicArgs> = {
   type: new GraphQLNonNull(UUIDType),
-  args: { id: { type: new GraphQLNonNull(UUIDType) } },
+  args: { id: UuidInput },
   resolve: deletePostResolver,
 };
 

@@ -6,23 +6,11 @@ import {
   GraphQLFieldConfig,
 } from 'graphql';
 import { Context } from '../types/context.js';
-import { Profile } from '@prisma/client';
 import { MembershipLevel } from '../member-types/type.js';
 import { UUIDType } from '../types/uuid.js';
-import { ProfileType } from './type.js';
+import { BasicArgs, ChangeProfile, CreateProfile, ProfileType } from './type.js';
 
-type ChangeProfile = {
-  id: string;
-  dto: Omit<Profile, 'id' | 'userId'>;
-};
-
-type CreateProfile = {
-  dto: Omit<Profile, 'id'>;
-};
-
-type DeleteProfile = {
-  id: string;
-};
+const UuidInput = { type: new GraphQLNonNull(UUIDType) };
 
 const CreateProfileInput = new GraphQLInputObjectType({
   name: 'CreateProfileInput',
@@ -30,7 +18,7 @@ const CreateProfileInput = new GraphQLInputObjectType({
     isMale: { type: new GraphQLNonNull(GraphQLBoolean) },
     yearOfBirth: { type: new GraphQLNonNull(GraphQLInt) },
     memberTypeId: { type: new GraphQLNonNull(MembershipLevel) },
-    userId: { type: new GraphQLNonNull(UUIDType) },
+    userId: UuidInput,
   }),
 });
 
@@ -66,7 +54,7 @@ async function changeProfileResolver(
 
 async function deleteProfileResolver(
   _source: unknown,
-  { id }: DeleteProfile,
+  { id }: BasicArgs,
   { prisma }: Context,
 ) {
   const profile = await prisma.profile.delete({
@@ -86,15 +74,15 @@ const createProfile: GraphQLFieldConfig<void, Context, CreateProfile> = {
 const changeProfile: GraphQLFieldConfig<void, Context, ChangeProfile> = {
   type: ProfileType,
   args: {
-    id: { type: new GraphQLNonNull(UUIDType) },
+    id: UuidInput,
     dto: { type: new GraphQLNonNull(ChangeProfileInput) },
   },
   resolve: changeProfileResolver,
 };
 
-const deleteProfile: GraphQLFieldConfig<void, Context, DeleteProfile> = {
-  type: new GraphQLNonNull(UUIDType),
-  args: { id: { type: new GraphQLNonNull(UUIDType) } },
+const deleteProfile: GraphQLFieldConfig<void, Context, BasicArgs> = {
+  type: UuidInput.type,
+  args: { id: UuidInput },
   resolve: deleteProfileResolver,
 };
 

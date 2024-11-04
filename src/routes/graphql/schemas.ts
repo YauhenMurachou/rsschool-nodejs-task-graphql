@@ -2,7 +2,9 @@ import { Type } from '@fastify/type-provider-typebox';
 import { GraphQLObjectType, GraphQLSchema } from 'graphql';
 import { memberTypeQueries } from './member-types/query.js';
 import { postQueries } from './posts/query.js';
+import { postMutations } from './posts/mutation.js';
 import { profileQueries } from './profiles/query.js';
+import { profileMutations } from './profiles/mutation.js';
 import { userMutations } from './users/mutation.js';
 import { userQueries } from './users/query.js';
 
@@ -32,14 +34,16 @@ const queryFields = {
   ...userQueries,
 };
 
-const mutationFields = {
-  ...userMutations,
-};
-
 const query = new GraphQLObjectType({
   name: 'Query',
   fields: () => queryFields,
 });
+
+const mutationFields = {
+  ...userMutations,
+  ...postMutations,
+  ...profileMutations,
+};
 
 const mutation = new GraphQLObjectType({
   name: 'Mutation',

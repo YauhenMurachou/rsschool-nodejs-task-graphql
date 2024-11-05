@@ -43,6 +43,12 @@ After completing the steps above, run these commands for work check:
 
 1. npm run test-queries
 2. npm run test-mutations
+3. npm run test-rule 
+
+Useful things:  
+
+1. npm run test-queries
+2. npm run test-mutations
 3. npm run test-rule
 
 Useful things:

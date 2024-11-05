@@ -42,9 +42,7 @@ Steps to get started:
 After completing the steps above, run these commands for work check:
 
 npm run test-queries
-
 npm run test-mutations
-
 npm run test-rule
 
 Useful things:  

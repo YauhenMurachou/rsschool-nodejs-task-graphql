@@ -41,9 +41,9 @@ Steps to get started:
 
 After completing the steps above, run these commands for work check:
 
-npm run test-queries
-npm run test-mutations
-npm run test-rule
+1. npm run test-queries
+2. npm run test-mutations
+3. npm run test-rule 
 
 Useful things:  
 

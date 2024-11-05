@@ -39,6 +39,11 @@ Steps to get started:
 5. Seed db: npx prisma db seed  
 6. Start server: npm run start  
 
+After completing the steps above, run these commands for work check:
+npm run test-queries
+npm run test-mutations
+npm run test-rule
+
 Useful things:  
 
 - Database GUI: npx prisma studio  

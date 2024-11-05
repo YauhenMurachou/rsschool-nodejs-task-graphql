@@ -40,8 +40,11 @@ Steps to get started:
 6. Start server: npm run start  
 
 After completing the steps above, run these commands for work check:
+
 npm run test-queries
+
 npm run test-mutations
+
 npm run test-rule
 
 Useful things:  
